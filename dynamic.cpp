@@ -28,7 +28,13 @@ class Override {
 	template <class ...FunctionArgs>
   return_type operator()(FunctionArgs... args) {
 		auto tuple = std::make_tuple(std::type_index(typeid(FunctionArgs))...);
-    auto func = m_funcs[tuple];
+    auto retrieved_func = m_funcs[tuple];
+
+		/**
+		 * We must cast back here otherwise we have undefined behavior:
+		 * http://eel.is/c++draft/expr.reinterpret.cast#6
+		 */
+		auto func = (return_type (*)(FunctionArgs...))retrieved_func;
 		return func(args...);
   }
 
